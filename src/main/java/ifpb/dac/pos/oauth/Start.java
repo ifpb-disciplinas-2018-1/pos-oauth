@@ -26,7 +26,21 @@ public class Start extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String client_id = request.getParameter("client_id");
-        String uri = "https://github.com/login/oauth/authorize?scope=repo&client_id=" + client_id;
+        String client_secret = request.getParameter("client_secret");
+
+//        request.getSession().setAttribute("client_id", client_id);
+//        request.getSession().setAttribute("client_secret", client_secret);
+        Dropbox dropbox = new Dropbox(
+                client_id,
+                client_secret,
+                "http://localhost:8080/oauth/token"
+        );
+
+        request.getSession().setAttribute("oauth", dropbox);
+        
+//        String uri = "https://github.com/login/oauth/authorize?scope=repo&client_id=" + client_id;
+        String format = String.format("client_id=%s&response_type=code&redirect_uri=http://localhost:8080/oauth/token", client_id);
+        String uri = "https://www.dropbox.com/oauth2/authorize?" + format;
         response.sendRedirect(uri);
     }
 

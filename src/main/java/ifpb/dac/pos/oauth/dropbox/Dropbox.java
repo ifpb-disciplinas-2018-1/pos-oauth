@@ -21,7 +21,7 @@ public class Dropbox extends OAuth {
     }
 
     @Override
-    public String urlAutorizeFormated() {
+    public String urlAuthorizeFormated() {
         String uri = String.format(
                 "%s?client_id=%s&response_type=code&redirect_uri=%s",
                 url_autorize,

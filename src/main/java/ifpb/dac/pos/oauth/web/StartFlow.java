@@ -1,7 +1,6 @@
 package ifpb.dac.pos.oauth.web;
 
-import ifpb.dac.pos.oauth.OAuth;
-import ifpb.dac.pos.oauth.github.Github;
+import ifpb.dac.pos.oauth.twitter.Twitter;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,22 +20,31 @@ public class StartFlow extends HttpServlet {
             throws ServletException, IOException {
         String client_id = request.getParameter("client_id");
         String client_secret = request.getParameter("client_secret");
+        String redirect_uri = request.getParameter("redirect_uri");
 
 //        OAuth oauth = new Dropbox(
 //                client_id,
 //                client_secret,
-//                "http://localhost:8080/oauth/token"
+////             "http://localhost:8080/oauth/token"
+//                redirect_uri
 //        );
-        OAuth oauth = new Github(
+//        OAuth oauth = new Github(
+//                client_id,
+//                client_secret,
+//                //                "http://localhost:8080/oauth/token"
+//                redirect_uri
+//        );
+        Twitter oauth = new Twitter(
                 client_id,
                 client_secret,
-                "http://localhost:8080/oauth/token"
+                redirect_uri
         );
 
         request.getSession().setAttribute("oauth", oauth);
 //        request.getSession().setAttribute("redirect", "files");
-        request.getSession().setAttribute("redirect", "user");
-        response.sendRedirect(oauth.urlAutorizeFormated());
+//        request.getSession().setAttribute("redirect", "user");
+        request.getSession().setAttribute("redirect", "profile");
+        response.sendRedirect(oauth.urlAuthorizeFormated());
     }
 
 }

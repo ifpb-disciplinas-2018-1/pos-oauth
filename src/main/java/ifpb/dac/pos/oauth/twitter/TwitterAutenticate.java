@@ -1,5 +1,6 @@
-package ifpb.dac.pos.oauth;
+package ifpb.dac.pos.oauth.twitter;
 
+import ifpb.dac.pos.oauth.Pair;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;

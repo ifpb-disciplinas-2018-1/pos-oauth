@@ -37,7 +37,9 @@ public class ServletOfCallback extends HttpServlet {
 //        dropbox(code, request, response);
     }
 
-    private void oauth(String code, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void oauth(String code,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
         OAuth oauth = (OAuth) request.getSession().getAttribute("oauth");
         Client client = ClientBuilder.newClient();
         WebTarget root = client
@@ -52,7 +54,7 @@ public class ServletOfCallback extends HttpServlet {
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form))
                 .readEntity(JsonObject.class);
-        Entity<Form> entity = Entity.form(form);
+//        Entity<Form> entity = Entity.form(form);
         String token = oauth.prefixHeader(json.getString("access_token"));
         request.getSession().setAttribute("token", token);
         request.getSession().removeAttribute("oauth");

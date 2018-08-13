@@ -19,7 +19,7 @@ public abstract class OAuth {
         this.redirect_uri = redirect_uri;
     }
 
-    public abstract String urlAutorizeFormated();
+    public abstract String urlAuthorizeFormated();
     public abstract String urlAcessToken();
     public abstract String prefixHeader(String token);
     public abstract List<Pair> forms();

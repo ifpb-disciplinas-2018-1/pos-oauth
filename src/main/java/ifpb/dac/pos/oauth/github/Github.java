@@ -4,7 +4,6 @@ import ifpb.dac.pos.oauth.OAuth;
 import ifpb.dac.pos.oauth.Pair;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Form;
 
 /**
  * @author Ricardo Job
@@ -21,7 +20,7 @@ public class Github extends OAuth {
     }
 
     @Override
-    public String urlAutorizeFormated() {
+    public String urlAuthorizeFormated() {
         String uri = String.format(
                 "%s?client_id=%s&scope=repo&redirect_uri=%s",
                 url_autorize,

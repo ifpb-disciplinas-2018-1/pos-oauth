@@ -1,12 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ifpb.dac.pos.oauth.web;
 
 import ifpb.dac.pos.oauth.OAuth;
-import ifpb.dac.pos.oauth.TwitterAutenticate;
+import ifpb.dac.pos.oauth.Pair;
+import ifpb.dac.pos.oauth.Requisicao;
+import ifpb.dac.pos.oauth.twitter.Twitter;
+import ifpb.dac.pos.oauth.twitter.TwitterAutenticate;
 import java.io.IOException;
 import javax.json.JsonObject;
 import javax.servlet.ServletException;
@@ -25,11 +23,9 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Ricardo Job
  */
+//http://localhost:8080/oauth/twitter?oauth_token=TW-GawAAAAAAFiEmAAABZTOsF44&oauth_verifier=CNosY2kXHWvMcDeSbaDJHqNWjHu5vLJd
 @WebServlet(name = "CallbackOfTwitter", urlPatterns = {"/twitter"})
 public class CallbackOfTwitter extends HttpServlet {
-//http://localhost:8080/oauth/twitter?
-    //oauth_token=TW-GawAAAAAAFiEmAAABZTOsF44
-//&oauth_verifier=CNosY2kXHWvMcDeSbaDJHqNWjHu5vLJd
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,26 +33,55 @@ public class CallbackOfTwitter extends HttpServlet {
         String oauth_token = request.getParameter("oauth_token");
         String oauth_verifier = request.getParameter("oauth_verifier");
 
-        Client client = ClientBuilder.newClient();
-        WebTarget root = client
-                .target("https://api.twitter.com/oauth/access_token");
+        OAuth oauth = (OAuth) request.getSession().getAttribute("oauth");
+
+//        Twitter twitter = new Twitter(
+//                "2URxXsnyMBfn71XTtRs8A",
+//                "CM8WbuGDFPIQGhkLhFEVQMyCK6sZFq10uXM4IzHQQ",
+//                "http://localhost:8080/oauth/token"
+//        );
+        Requisicao rq = new Requisicao(
+                oauth
+        );
 
         TwitterAutenticate a = new TwitterAutenticate(oauth_token, oauth_verifier);
-        String authorization = a.headerAuthorization("POST", "https://api.twitter.com/oauth/access_token");
+        String authorization = a.headerAuthorization("POST", oauth.urlAcessToken());
 
-        Form form = new Form("oauth_verifier", oauth_verifier);
-
-        String json = root.request()
-                .accept(MediaType.APPLICATION_JSON)
-                .header("Content-Type", MediaType.APPLICATION_JSON)
-                .header("Authorization", authorization)
-                .post(Entity.form(form))
-                .readEntity(String.class);
-
+        String json = rq.accessToken(
+                authorization,
+                Pair.create("oauth_verifier", oauth_verifier)
+        );
         response.getWriter().println(
                 json
         );
 
+//        String token = oauth.prefixHeader(jsons.getString("access_token"));
+//        request.getSession().setAttribute("token", token);
+//        request.getSession().removeAttribute("oauth");
+//        String redirect = (String) request.getSession().getAttribute("redirect");
+//        request.getRequestDispatcher(redirect).forward(request, response);
+    }
+
+    public void hulk(HttpServletRequest request, HttpServletResponse response) {
+        String oauth_token = request.getParameter("oauth_token");
+        String oauth_verifier = request.getParameter("oauth_verifier");
+
+        OAuth oauth = (OAuth) request.getSession().getAttribute("oauth");
+
+        Requisicao rq = new Requisicao(
+                oauth
+        );
+
+        TwitterAutenticate a = new TwitterAutenticate(oauth_token, oauth_verifier);
+        String authorization = a.headerAuthorization("POST", oauth.urlAcessToken());
+
+        String json = rq.accessToken(
+                authorization,
+                Pair.create("oauth_verifier", oauth_verifier)
+        );
+        response.getWriter().println(
+                json
+        );
     }
 
     private void dropbox(String code, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

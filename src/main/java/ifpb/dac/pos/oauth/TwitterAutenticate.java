@@ -34,38 +34,22 @@ public class TwitterAutenticate {
     }
 
     public String headerAuthorization(String method, String twitterEndpoint, List<Pair> params) {
-        String oauthSignatureMethod = "HMAC-SHA1";
         String oauthTimestamp = Long.toString(System.currentTimeMillis() / 1000);
         String oauthNonce = "pos12desdfedrfedwsderd" + oauthTimestamp;
-        
-        List<Pair> allParams = new ArrayList<>();
-        allParams.add(Pair.create("oauth_consumer_key", consumerKey));
-        allParams.add(Pair.create("oauth_nonce", oauthNonce));
-        allParams.add(Pair.create("oauth_signature_method", oauthSignatureMethod));
-        allParams.add(Pair.create("oauth_timestamp", oauthTimestamp));
-        allParams.add(Pair.create("oauth_version", "1.0"));
-        
-        if (!"".equals(token.trim())) {
-            allParams.add(Pair.create("oauth_token", token));
-        }
 
-        allParams.addAll(params);
+        String parameters = paramToString(oauthNonce, oauthTimestamp, params);
 
-        String parameters = allParams.stream()
-                .sorted((p1, p2) -> p1.key().compareTo(p2.key()))
-                .map(toPair())
-                .collect(Collectors.joining("&"));
+        String oauthSignature = signatureBaseToString(method, twitterEndpoint, parameters);
 
-        String signatureBase = method + "&" + encode(twitterEndpoint) + "&" + encode(parameters);
-        String oauthVerifier = ("".equals(verifier.trim())) ? "" : encode(verifier);
-        String composite = encode(consumerSecret) + "&" + oauthVerifier;
-        String oauthSignature = "";
-        try {
-            oauthSignature = computeSignature(signatureBase, composite);
-        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            // TODO throw new RuntimeExpection(); 
-            e.printStackTrace();
-        }
+        String authorizationHeader = headerToString(oauthNonce, oauthTimestamp, oauthSignature);
+
+        return authorizationHeader;
+    }
+
+    private String headerToString(
+            String oauthNonce,
+            String oauthTimestamp,
+            String oauthSignature) {
         String oauthToken = ("".equals(token.trim())) ? "" : "\", oauth_token=\"" + token;
         String authorizationHeader = "OAuth "
                 + "oauth_consumer_key=\"" + consumerKey
@@ -76,6 +60,45 @@ public class TwitterAutenticate {
                 + oauthToken
                 + "\", oauth_version=\"1.0\"";
         return authorizationHeader;
+    }
+
+    private String signatureBaseToString(
+            String method,
+            String twitterEndpoint,
+            String parameters) {
+        String signatureBase = method + "&" + encode(twitterEndpoint) + "&" + encode(parameters);
+        String oauthVerifier = ("".equals(verifier.trim())) ? "" : encode(verifier);
+        String composite = encode(consumerSecret) + "&" + oauthVerifier;
+        String oauthSignature = "";
+        try {
+            oauthSignature = computeSignature(signatureBase, composite);
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            // TODO throw new RuntimeExpection();
+            e.printStackTrace();
+        }
+        return oauthSignature;
+    }
+
+    private String paramToString(
+            String oauthNonce,
+            String oauthTimestamp,
+            List<Pair> params) {
+        String oauthSignatureMethod = "HMAC-SHA1";
+        List<Pair> allParams = new ArrayList<>();
+        allParams.add(Pair.create("oauth_consumer_key", consumerKey));
+        allParams.add(Pair.create("oauth_nonce", oauthNonce));
+        allParams.add(Pair.create("oauth_signature_method", oauthSignatureMethod));
+        allParams.add(Pair.create("oauth_timestamp", oauthTimestamp));
+        allParams.add(Pair.create("oauth_version", "1.0"));
+        if (!"".equals(token.trim())) {
+            allParams.add(Pair.create("oauth_token", token));
+        }
+        allParams.addAll(params);
+        String parameters = allParams.stream()
+                .sorted((p1, p2) -> p1.key().compareTo(p2.key()))
+                .map(toPair())
+                .collect(Collectors.joining("&"));
+        return parameters;
     }
 
     protected String computeSignature(String baseString, String keyString) throws GeneralSecurityException, UnsupportedEncodingException {

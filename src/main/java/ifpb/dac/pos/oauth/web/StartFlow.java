@@ -1,5 +1,7 @@
-package ifpb.dac.pos.oauth;
+package ifpb.dac.pos.oauth.web;
 
+import ifpb.dac.pos.oauth.OAuth;
+import ifpb.dac.pos.oauth.github.Github;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Ricardo Job
  */
 @WebServlet(name = "Start", urlPatterns = {"/start"})
-public class Start extends HttpServlet {
+public class StartFlow extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

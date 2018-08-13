@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ifpb.dac.pos.oauth;
+package ifpb.dac.pos.oauth.web;
 
+import ifpb.dac.pos.oauth.OAuth;
 import java.io.IOException;
 import javax.json.JsonObject;
 import javax.servlet.ServletException;

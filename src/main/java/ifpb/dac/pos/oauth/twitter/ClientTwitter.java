@@ -19,14 +19,18 @@ import javax.ws.rs.core.Response;
 public class ClientTwitter {
 
     public static void main(String[] args) throws IOException {
+        //Token e verifier vazios
         TwitterAutenticate a = new TwitterAutenticate("", "");
+        //Gerar o header
         String authorization = a.headerAuthorization("POST", "https://api.twitter.com/oauth/request_token");
-        System.out.println("authorization = " + authorization);
+//        System.out.println("authorization = " + authorization);
 
         Client newBuilder = ClientBuilder.newBuilder().build();
-        WebTarget target = newBuilder.target("https://api.twitter.com/oauth/request_token");
+        WebTarget target = newBuilder
+                .target("https://api.twitter.com/oauth/request_token");
 
-        Response post = target.request().accept(MediaType.APPLICATION_JSON)
+        Response post = target.request()
+                .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", authorization)
                 .post(Entity.json(""));
 

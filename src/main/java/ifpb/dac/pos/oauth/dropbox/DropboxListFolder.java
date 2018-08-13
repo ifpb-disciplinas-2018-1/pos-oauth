@@ -1,4 +1,4 @@
-package ifpb.dac.pos.oauth;
+package ifpb.dac.pos.oauth.dropbox;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,6 +36,7 @@ public class DropboxListFolder extends HttpServlet {
         WebTarget listFolder = client.target("https://api.dropboxapi.com/2/files/list_folder");
 
         String token = (String) request.getSession().getAttribute("token");
+        
         String param = "{\n"
                 + "    \"path\": \"\",\n"
                 + "    \"recursive\": false,\n"
@@ -65,7 +66,7 @@ public class DropboxListFolder extends HttpServlet {
                                 "<p>"+j.getString("path_display")+"</p>"
                         );
                     } catch (IOException ex) {
-                        Logger.getLogger(Token.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(DropboxListFolder.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
         );

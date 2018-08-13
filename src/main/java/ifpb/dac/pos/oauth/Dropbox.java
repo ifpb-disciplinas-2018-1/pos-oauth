@@ -7,7 +7,7 @@ package ifpb.dac.pos.oauth;
  */
 public class Dropbox {
 
-    private final String url_autorize = "";
+    private final String url_autorize = "https://www.dropbox.com/oauth2/authorize";
     private final String url_acess_token = "https://api.dropboxapi.com/oauth2/token";
 
     private final String client_id;
@@ -36,4 +36,17 @@ public class Dropbox {
         return url_acess_token;
     }
 
+    public String getUrl_autorize() {
+        return url_autorize;
+    }
+
+    public String urlAutorizeFormated() {
+        String uri = String.format(
+                "%s?client_id=%s&response_type=code&redirect_uri=%s",
+                url_autorize,
+                client_id,
+                redirect_uri
+        );
+        return uri;
+    }
 }

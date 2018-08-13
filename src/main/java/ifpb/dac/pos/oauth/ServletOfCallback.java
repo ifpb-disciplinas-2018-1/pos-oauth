@@ -31,22 +31,40 @@ public class ServletOfCallback extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String code = request.getParameter("code");
-
-        github(code, request, response);
+        oauth(code, request, response);
+//        github(code, request, response);
 //        dropbox(code, request, response);
     }
 
+    private void oauth(String code, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        OAuth oauth = (OAuth) request.getSession().getAttribute("oauth");
+        Client client = ClientBuilder.newClient();
+        WebTarget root = client
+                .target(oauth.urlAcessToken());
+
+        Form form = new Form("code", code);
+        oauth.forms().forEach((pair) -> {
+            form.param(pair.key(), pair.value().toString());
+        });
+
+        JsonObject json = root.request()
+                .accept(MediaType.APPLICATION_JSON)
+                .post(Entity.form(form))
+                .readEntity(JsonObject.class);
+        Entity<Form> entity = Entity.form(form);
+        String token = oauth.prefixHeader(json.getString("access_token"));
+        request.getSession().setAttribute("token", token);
+        request.getSession().removeAttribute("oauth");
+        String redirect = (String) request.getSession().getAttribute("redirect");
+        request.getRequestDispatcher(redirect).forward(request, response);
+    }
+
     private void github(String code, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        //POST https://github.com/login/oauth/access_token
-        //client_id 09f559456922d0d2c783
-        //client_secret 7cd100ecdc8bcc32049ede82509ef12158e70140
-        //code code
-        //state  repo
-        Github github = (Github) request.getSession().getAttribute("oauth");
+        OAuth github = (OAuth) request.getSession().getAttribute("oauth");
 
         Client client = ClientBuilder.newClient();
         WebTarget root = client
-                .target(github.getUrl_acess_token());
+                .target(github.urlAcessToken());
 
         Form form = new Form("client_id", github.getClient_id())
                 .param("client_secret", github.getClient_secret())
@@ -69,11 +87,11 @@ public class ServletOfCallback extends HttpServlet {
     }
 
     private void dropbox(String code, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Dropbox dropbox = (Dropbox) request.getSession().getAttribute("oauth");
+        OAuth dropbox = (OAuth) request.getSession().getAttribute("oauth");
 
         Client client = ClientBuilder.newClient();
         WebTarget root = client
-                .target(dropbox.getUrl_acess_token());
+                .target(dropbox.urlAcessToken());
 
         Form form = new Form("code", code)
                 .param("grant_type", "authorization_code")
@@ -85,12 +103,12 @@ public class ServletOfCallback extends HttpServlet {
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.form(form))
                 .readEntity(JsonObject.class);
+        Entity<Form> entity = Entity.form(form);
 
         String token = "Bearer " + json.getString("access_token");
 
         request.getSession().setAttribute("token", token);
         request.getSession().removeAttribute("oauth");
-
         request.getRequestDispatcher("files").forward(request, response);
 
     }

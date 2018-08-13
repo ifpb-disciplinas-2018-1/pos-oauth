@@ -20,18 +20,20 @@ public class Start extends HttpServlet {
         String client_id = request.getParameter("client_id");
         String client_secret = request.getParameter("client_secret");
 
-//        Dropbox oauth = new Dropbox(
+//        OAuth oauth = new Dropbox(
 //                client_id,
 //                client_secret,
 //                "http://localhost:8080/oauth/token"
 //        );
-        Github oauth = new Github(
+        OAuth oauth = new Github(
                 client_id,
                 client_secret,
                 "http://localhost:8080/oauth/token"
         );
 
         request.getSession().setAttribute("oauth", oauth);
+//        request.getSession().setAttribute("redirect", "files");
+        request.getSession().setAttribute("redirect", "user");
         response.sendRedirect(oauth.urlAutorizeFormated());
     }
 

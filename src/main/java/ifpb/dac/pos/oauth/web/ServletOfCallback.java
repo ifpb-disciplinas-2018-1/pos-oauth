@@ -1,12 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ifpb.dac.pos.oauth.web;
 
 import ifpb.dac.pos.oauth.OAuth;
+import ifpb.dac.pos.oauth.Token;
 import java.io.IOException;
+import java.util.Enumeration;
 import javax.json.JsonObject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -55,7 +52,22 @@ public class ServletOfCallback extends HttpServlet {
                 .post(Entity.form(form))
                 .readEntity(JsonObject.class);
 //        Entity<Form> entity = Entity.form(form);
-        String token = oauth.prefixHeader(json.getString("access_token"));
+        String header = oauth.prefixHeader(json.getString("access_token"));
+        Token token = Token
+                .from(json)
+                .header(header);
+//        System.out.println(request.getPathTranslated());;
+//        System.out.println(request.getRemoteAddr());;
+//        System.out.println(request.getRemoteHost());;
+//        request.getParameterMap().forEach((k, v) -> System.out.println(k + "->" + v));
+//        System.out.println(request.getContextPath());
+//        System.out.println(request.getRequestURI());
+//        System.out.println(request.getServletPath());
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String nextElement = headerNames.nextElement();
+            System.out.println("k (" + nextElement + " )-> " + request.getHeader(nextElement));
+        }
         request.getSession().setAttribute("token", token);
         request.getSession().removeAttribute("oauth");
         String redirect = (String) request.getSession().getAttribute("redirect");

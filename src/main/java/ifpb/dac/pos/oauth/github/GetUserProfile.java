@@ -1,5 +1,6 @@
 package ifpb.dac.pos.oauth.github;
 
+import ifpb.dac.pos.oauth.Token;
 import java.io.IOException;
 import javax.json.JsonObject;
 import javax.servlet.ServletException;
@@ -25,12 +26,12 @@ public class GetUserProfile extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Client client = ClientBuilder.newClient();
-        String token = (String) request.getSession().getAttribute("token");
+        Token token = (Token) request.getSession().getAttribute("token");
 
         WebTarget user = client.target("https://api.github.com/user");
         JsonObject jsonUser = user
                 .request()
-                .header("Authorization", token)
+                .header("Authorization", token.authorized())
                 .get(JsonObject.class);
 
         response.getWriter().println(

@@ -4,7 +4,6 @@ import ifpb.dac.pos.oauth.OAuth;
 import ifpb.dac.pos.oauth.Pair;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.Form;
 
 /**
  * @author Ricardo Job

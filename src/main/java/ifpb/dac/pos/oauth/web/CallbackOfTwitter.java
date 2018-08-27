@@ -3,6 +3,7 @@ package ifpb.dac.pos.oauth.web;
 import ifpb.dac.pos.oauth.OAuth;
 import ifpb.dac.pos.oauth.Pair;
 import ifpb.dac.pos.oauth.Requisicao;
+import ifpb.dac.pos.oauth.Token;
 import ifpb.dac.pos.oauth.twitter.Twitter;
 import ifpb.dac.pos.oauth.twitter.TwitterAutenticate;
 import java.io.IOException;
@@ -32,37 +33,86 @@ public class CallbackOfTwitter extends HttpServlet {
             throws ServletException, IOException {
         String oauth_token = request.getParameter("oauth_token");
         String oauth_verifier = request.getParameter("oauth_verifier");
+        System.out.println("oauth_token = " + oauth_token);
+        System.out.println("oauth_verifier = " + oauth_verifier);
+//        OAuth oauth = (OAuth) request.getSession().getAttribute("oauth");
 
-        OAuth oauth = (OAuth) request.getSession().getAttribute("oauth");
-
-//        Twitter twitter = new Twitter(
-//                "2URxXsnyMBfn71XTtRs8A",
-//                "CM8WbuGDFPIQGhkLhFEVQMyCK6sZFq10uXM4IzHQQ",
-//                "http://localhost:8080/oauth/token"
-//        );
+        Twitter oauth = new Twitter(
+                "2URxXsnyMBfn71XTtRs8A",
+                "CM8WbuGDFPIQGhkLhFEVQMyCK6sZFq10uXM4IzHQQ",
+                "http://localhost:8080/oauth/token"
+        );
         Requisicao rq = new Requisicao(
                 oauth
         );
 
-        TwitterAutenticate a = new TwitterAutenticate(oauth_token, oauth_verifier);
-        String authorization = a.headerAuthorization("POST", oauth.urlAcessToken());
+        TwitterAutenticate autenticate = new TwitterAutenticate(
+                oauth_token, oauth_verifier
+        );
+        String authorization = autenticate.headerAuthorization(
+                "POST", oauth.urlAcessToken()
+        );
 
         String json = rq.accessToken(
                 authorization,
                 Pair.create("oauth_verifier", oauth_verifier)
         );
-        response.getWriter().println(
-                json
-        );
+//        response.getWriter().println(
+//                json
+//        );
+        
+        Token token = Token.from(json);
+//                tokenizer.nextToken().split("=")[1],
+//                tokenizer.nextToken().split("=")[1]);
 
-//        String token = oauth.prefixHeader(jsons.getString("access_token"));
-//        request.getSession().setAttribute("token", token);
+        request.getSession().setAttribute("token", token);
+        request.getRequestDispatcher("timeline").forward(request, response);
+        /*
+        System.out.println(token.value());
+        System.out.println(token.secret());
+        autenticate = new TwitterAutenticate(
+                "90332417-YWgBgJkfrMNizwRi5vXMih4n3ikarxj9ZO3uRVocn",
+                "wjdFh2OTy6EXaAuoGI9B3V8V3G571Bb1jWwb39sXevgQu"
+        );
+        request.getSession().setAttribute("oauth_token", oauth_token);
+        request.getSession().setAttribute("oauth_verifier", oauth_verifier);
 //        request.getSession().removeAttribute("oauth");
 //        String redirect = (String) request.getSession().getAttribute("redirect");
-//        request.getRequestDispatcher(redirect).forward(request, response);
+//        request.getRequestDispatcher("timeline").forward(request, response);
+//        List<Pair> pairs = Arrays.asList(
+//                Pair.create("count", "2"),
+//                Pair.create("include_rts", "true")
+//        );
+        Client client = ClientBuilder.newClient();
+        String headerAuthorization = autenticate
+                .headerAuthorization(
+                        "GET",
+                        "https://api.twitter.com/1.1/statuses/user_timeline.json"
+                //                        pairs
+                );
+        WebTarget timelineTarget = client.target("https://api.twitter.com/1.1/statuses/user_timeline.json");
+        Response time = timelineTarget
+                //                .queryParam("count", "2")
+                //                .queryParam("include_rts", "true")
+                .request()
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", headerAuthorization)
+                .get();
+        response.getWriter().println(
+                time
+        );
+
+        String readEntity = time.readEntity(String.class);
+
+        response.getWriter().println(
+                readEntity
+        );
+**/
+
     }
 
-    public void hulk(HttpServletRequest request, HttpServletResponse response) {
+    public void hulk(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String oauth_token = request.getParameter("oauth_token");
         String oauth_verifier = request.getParameter("oauth_verifier");
 

@@ -19,8 +19,8 @@ import javax.ws.rs.core.MediaType;
 public class ClientTwitter {
 
     public static void main(String[] args) throws IOException {
-        //        staticMethod();
-        withRequest();
+                staticMethod();
+//        withRequest();
 
     }
 

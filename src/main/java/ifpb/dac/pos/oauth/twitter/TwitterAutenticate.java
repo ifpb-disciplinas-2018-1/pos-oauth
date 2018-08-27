@@ -99,6 +99,7 @@ public class TwitterAutenticate {
                 .sorted((p1, p2) -> p1.key().compareTo(p2.key()))
                 .map(toPair())
                 .collect(Collectors.joining("&"));
+//        System.out.println(parameters);
         return parameters;
     }
 
